@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import pandas as pd
 import numpy as np
 import joblib
 from pathlib import Path
@@ -90,14 +91,14 @@ def predict(payload: PredictRequest):
         return {"error": "Model or preprocessor not loaded"}
 
     # Prepare features in expected order
-    features = np.array([
-        [
-            payload.tv,
-            payload.radio,
-            payload.social_media,
-            payload.influencer,
-        ]
-    ], dtype=object)
+    features = pd.DataFrame([
+        {
+            "TV": payload.tv,
+            "Radio": payload.radio,
+            "Social Media": payload.social_media,
+            "Influencer": payload.influencer,
+        }
+    ])
 
     # Preprocess and predict
     try:
@@ -130,12 +131,14 @@ def predict_batch(payload: PredictBatchRequest):
 
     for item in payload.items:
         try:
-            features = np.array([[
-                item.tv,
-                item.radio,
-                item.social_media,
-                item.influencer,
-            ]], dtype=object)
+            features = pd.DataFrame([
+                {
+                    "TV": item.tv,
+                    "Radio": item.radio,
+                    "Social Media": item.social_media,
+                    "Influencer": item.influencer,
+                }
+            ])
 
             features_preprocessed = preprocessor.transform(features)
             prediction = float(model.predict(features_preprocessed)[0])
