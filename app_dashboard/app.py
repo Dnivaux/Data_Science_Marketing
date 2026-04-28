@@ -205,6 +205,7 @@ with st.spinner("Calcul SHAP en cours..."):
 st.caption("Rouge = augmente les ventes  |  Bleu = réduit les ventes")
 
 st.markdown("---")
+st.markdown("--- Espace technique ---")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # TABLEAU COMPARATIF DES MODÈLES
