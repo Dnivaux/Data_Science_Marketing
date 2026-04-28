@@ -56,15 +56,24 @@ ref_roi   = compute_roi(ref_sales, REF["TV"], REF["Radio"], REF["Social Media"])
 # ═════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
     st.title("Paramètres budget")
+    st.caption("Les budgets sont exprimés en milliers d'euros (k€).")
     st.markdown("---")
 
-    tv     = st.slider("TV",           min_value=10.0,  max_value=100.0,  value=54.07, step=0.5)
-    radio  = st.slider("Radio",        min_value=0.0,   max_value=48.87,  value=18.16, step=0.5)
-    social = st.slider("Social Media", min_value=0.0,   max_value=13.98,  value=3.33,  step=0.1)
-    influencer = st.selectbox("Influenceur", ["Mega", "Macro", "Micro", "Nano"], index=0)
+    tv     = st.slider("TV (k€)",           min_value=10.0,  max_value=100.0,  value=54.07, step=0.5)
+    st.caption(f"Budget TV actuel : **{tv:.1f} k€** — plage observée : 10 à 100 k€")
+
+    radio  = st.slider("Radio (k€)",        min_value=0.0,   max_value=48.87,  value=18.16, step=0.5)
+    st.caption(f"Budget Radio actuel : **{radio:.1f} k€** — plage observée : 0 à 48.9 k€")
+
+    social = st.slider("Social Media (k€)", min_value=0.0,   max_value=13.98,  value=3.33,  step=0.1)
+    st.caption(f"Budget Social Media actuel : **{social:.1f} k€** — plage observée : 0 à 14 k€")
 
     st.markdown("---")
-    st.caption("Valeurs de référence : budgets moyens observés sur le dataset.")
+    influencer = st.selectbox("Type d'influenceur", ["Mega", "Macro", "Micro", "Nano"], index=0)
+    st.caption("Mega : >1M abonnés · Macro : 100K–1M · Micro : 10K–100K · Nano : <10K")
+
+    st.markdown("---")
+    st.caption("Référence : budgets moyens observés sur le dataset (TV 54 k€, Radio 18 k€, Social 3.3 k€).")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # CALCULS SCENARIO ACTUEL
