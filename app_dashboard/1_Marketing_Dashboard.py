@@ -15,7 +15,7 @@ FIGURES    = ROOT / "reports" / "figures"
 
 # ── Config page ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Marketing ROI Dashboard",
+    page_title="Marketing Dashboard",
     page_icon="📊",
     layout="wide",
 )
@@ -87,7 +87,7 @@ delta_roi   = cur_roi   - ref_roi
 # ═════════════════════════════════════════════════════════════════════════════
 # HEADER
 # ═════════════════════════════════════════════════════════════════════════════
-st.title("Marketing ROI Dashboard")
+st.title("Marketing Dashboard")
 st.markdown("Simulez l'impact de votre budget marketing sur les ventes et le ROI en temps réel.")
 st.markdown("---")
 
@@ -203,30 +203,3 @@ with st.spinner("Calcul SHAP en cours..."):
     st.plotly_chart(fig_shap, use_container_width=True)
 
 st.caption("Rouge = augmente les ventes  |  Bleu = réduit les ventes")
-
-st.markdown("---")
-st.markdown("--- Espace technique ---")
-
-# ═════════════════════════════════════════════════════════════════════════════
-# TABLEAU COMPARATIF DES MODÈLES
-# ═════════════════════════════════════════════════════════════════════════════
-st.subheader("Comparatif des modèles entraînés")
-st.markdown("Justification du choix du modèle de production.")
-
-model_scores = pd.DataFrame([
-    {"Modèle": "XGBoost ✅",          "CV R² moyen": 0.9954, "Test R²": 0.9987, "Test MAE": 2.64, "Test RMSE": 3.35},
-    {"Modèle": "Random Forest",        "CV R² moyen": 0.9958, "Test R²": 0.9983, "Test MAE": 2.73, "Test RMSE": 3.82},
-    {"Modèle": "Linear Regression",    "CV R² moyen": 0.9950, "Test R²": 0.9960, "Test MAE": 2.59, "Test RMSE": 5.88},
-    {"Modèle": "Deep Learning (MLP)",  "CV R² moyen": 0.9942, "Test R²": 0.9951, "Test MAE": 3.36, "Test RMSE": 6.49},
-])
-
-st.dataframe(
-    model_scores.style
-        .highlight_max(subset=["CV R² moyen", "Test R²"], color="#d4edda")
-        .highlight_min(subset=["Test MAE", "Test RMSE"],  color="#d4edda")
-        .format({"CV R² moyen": "{:.4f}", "Test R²": "{:.4f}",
-                 "Test MAE": "{:.2f}", "Test RMSE": "{:.2f}"}),
-    use_container_width=True,
-    hide_index=True,
-)
-st.caption("✅ = modèle sélectionné pour la production (meilleur Test R² et RMSE)")
