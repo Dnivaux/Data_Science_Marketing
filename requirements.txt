@@ -1,3 +1,4 @@
+fastapi
 joblib
 matplotlib
 numpy
@@ -6,4 +7,5 @@ plotly
 scikit-learn
 shap
 streamlit
+uvicorn[standard]==0.24.0
 xgboost
