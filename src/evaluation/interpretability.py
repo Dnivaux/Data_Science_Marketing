@@ -33,8 +33,8 @@ def calculate_marketing_roi(df_input: pd.DataFrame, predictions: np.ndarray) -> 
 
 
 def shap_analysis(model, x_test_preprocessed: np.ndarray):
-    explainer   = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(x_test_preprocessed)
+    explainer   = shap.Explainer(model, x_test_preprocessed)
+    shap_values = explainer(x_test_preprocessed).values
 
     plt.figure()
     shap.summary_plot(
