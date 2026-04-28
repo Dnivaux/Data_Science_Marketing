@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
 def load_data(filepath):
-    df = pd.read_csv('../../data/Dummy Data HSS.csv')
+    df = pd.read_csv(filepath)
     df = df.dropna(subset=["Sales"])
     return df
 
@@ -35,7 +35,7 @@ def get_preprocessing_pipeline():
     return preprocessor
 
 
-def get_preprocessed_data(filepath, save_preprocesssor=False, preprocessor_path="preprocessor.joblib"):
+def get_preprocessed_data(filepath, save_preprocessor=False, preprocessor_path="preprocessor.joblib"):
     df = load_data(filepath)
 
     x = df.drop("Sales", axis=1)
@@ -48,14 +48,14 @@ def get_preprocessed_data(filepath, save_preprocesssor=False, preprocessor_path=
     x_train_preprocessed = preprocessor.fit_transform(x_train)
     x_test_preprocessed = preprocessor.transform(x_test)
 
-    if save_preprocesssor:
+    if save_preprocessor:
         joblib.dump(preprocessor, preprocessor_path)
 
     return x_train_preprocessed, x_test_preprocessed, y_train, y_test, preprocessor
 
 if __name__ == "__main__":
     filepath = "../../data/Dummy Data HSS.csv"
-    x_train, x_test, y_train, y_test, preprocessor = get_preprocessed_data(filepath, save_preprocesssor=True, preprocessor_path="preprocessor.joblib")  
+    x_train, x_test, y_train, y_test, preprocessor = get_preprocessed_data(filepath, save_preprocessor=True, preprocessor_path="preprocessor.joblib")  
 
     print("Preprocessing completed. Preprocessor saved to preprocessor.joblib")
     print("x_train shape:", x_train.shape)
