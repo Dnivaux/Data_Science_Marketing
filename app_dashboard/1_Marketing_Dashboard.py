@@ -63,24 +63,24 @@ ref_roi      = compute_roi(ref_sales, REF["TV"], REF["Radio"], REF["Social Media
 # ═════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
     st.title("Paramètres budget")
-    st.caption("Les budgets sont exprimés en milliers d'euros (k€).")
+    st.caption("Les budgets sont exprimés en millions d'euros (M€).")
     st.markdown("---")
 
-    tv     = st.slider("TV (k€)",           min_value=10.0,  max_value=100.0,  value=54.07, step=0.5)
-    st.caption(f"Budget TV actuel : **{tv:.1f} k€** — plage observée : 10 à 100 k€")
+    tv     = st.slider("TV (M€)",           min_value=10.0,  max_value=100.0,  value=54.07, step=0.5)
+    st.caption(f"Budget TV actuel : **{tv:.1f} M€** — plage observée : 10 à 100 M€")
 
-    radio  = st.slider("Radio (k€)",        min_value=0.0,   max_value=48.87,  value=18.16, step=0.5)
-    st.caption(f"Budget Radio actuel : **{radio:.1f} k€** — plage observée : 0 à 48.9 k€")
+    radio  = st.slider("Radio (M€)",        min_value=0.0,   max_value=48.87,  value=18.16, step=0.5)
+    st.caption(f"Budget Radio actuel : **{radio:.1f} M€** — plage observée : 0 à 48.9 M€")
 
-    social = st.slider("Social Media (k€)", min_value=0.0,   max_value=13.98,  value=3.33,  step=0.1)
-    st.caption(f"Budget Social Media actuel : **{social:.1f} k€** — plage observée : 0 à 14 k€")
+    social = st.slider("Social Media (M€)", min_value=0.0,   max_value=13.98,  value=3.33,  step=0.1)
+    st.caption(f"Budget Social Media actuel : **{social:.1f} M€** — plage observée : 0 à 14 M€")
 
     st.markdown("---")
     influencer = st.selectbox("Type d'influenceur", ["Mega", "Macro", "Micro", "Nano"], index=0)
     st.caption("Mega : >1M abonnés · Macro : 100K–1M · Micro : 10K–100K · Nano : <10K")
 
     st.markdown("---")
-    st.caption("Référence : budgets moyens observés sur le dataset (TV 54 k€, Radio 18 k€, Social 3.3 k€).")
+    st.caption("Référence : budgets moyens observés sur le dataset (TV 54 M€, Radio 18 M€, Social 3.3 M€).")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # CALCULS SCENARIO ACTUEL
@@ -107,9 +107,9 @@ st.markdown("---")
 # MÉTRIQUES PRINCIPALES
 # ═════════════════════════════════════════════════════════════════════════════
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Ventes prédites",  f"{cur_sales:.1f} k€", f"{delta_sales:+.1f} vs référence")
+col1.metric("Ventes prédites",  f"{cur_sales:.1f} M€", f"{delta_sales:+.1f} vs référence")
 col2.metric("ROI prédit",       f"{cur_roi:.2%}",       f"{delta_roi:+.2%} vs référence")
-col3.metric("Budget total",     f"{tv + radio + social:.1f} k€")
+col3.metric("Budget total",     f"{tv + radio + social:.1f} M€")
 col4.metric("Modèle utilisé",  f"XGBoost ({pred_source})")
 
 st.markdown("---")
@@ -128,13 +128,13 @@ with left:
             x=["Référence (budget moyen)", "Scénario actuel"],
             y=[ref_sales, cur_sales],
             marker_color=["#ADB5BD", bar_color],
-            text=[f"{ref_sales:.1f} k€", f"{cur_sales:.1f} k€"],
+            text=[f"{ref_sales:.1f} M€", f"{cur_sales:.1f} M€"],
             textposition="outside",
-            hovertemplate="<b>%{x}</b><br>Ventes : %{y:.1f} k€<extra></extra>",
+            hovertemplate="<b>%{x}</b><br>Ventes : %{y:.1f} M€<extra></extra>",
         )
     ])
     fig_bar.update_layout(
-        yaxis_title="Ventes prédites (k€)",
+        yaxis_title="Ventes prédites (M€)",
         yaxis_range=[0, max(ref_sales, cur_sales) * 1.25],
         plot_bgcolor="white",
         margin=dict(t=20, b=10),
@@ -155,7 +155,7 @@ with right:
         textinfo="percent",
         textposition="inside",
         insidetextorientation="radial",
-        hovertemplate="<b>%{label}</b><br>Budget : %{value:.1f} k€<br>Part : %{percent}<extra></extra>",
+        hovertemplate="<b>%{label}</b><br>Budget : %{value:.1f} M€<br>Part : %{percent}<extra></extra>",
         pull=[0.03, 0.03, 0.03],
     )])
     fig_pie.update_layout(
@@ -164,7 +164,7 @@ with right:
         margin=dict(t=20, b=20, l=20, r=120),
         height=350,
         annotations=[dict(
-            text=f"<b>{tv + radio + social:.1f} k€</b>",
+            text=f"<b>{tv + radio + social:.1f} M€</b>",
             x=0.5, y=0.5, font_size=15, showarrow=False
         )],
     )

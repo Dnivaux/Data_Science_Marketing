@@ -81,8 +81,8 @@ st.markdown(
     """
     **Modèle retenu : XGBoost**
 
-    XGBoost présente le meilleur R² sur le jeu de test (0.9987) et le RMSE le plus faible (3.35 k€),
-    ce qui signifie que ses prédictions s'écartent en moyenne de seulement **3 350 €** des ventes réelles.
+    XGBoost présente le meilleur R² sur le jeu de test (0.9987) et le RMSE le plus faible (3.35 M€),
+    ce qui signifie que ses prédictions s'écartent en moyenne de seulement **3,35 M€** des ventes réelles.
     La validation croisée 5-fold confirme la stabilité du modèle (écart-type R² < 0.002).
 
     Le MLP (Deep Learning) obtient les scores les plus faibles ici, ce qui s'explique par la nature
@@ -195,7 +195,7 @@ st.markdown(
     **Lecture du graphique**
 
     La distribution des résidus (ventes réelles − ventes prédites) est centrée sur zéro
-    (résidu moyen ≈ 0 k€), ce qui indique que **le modèle ne présente pas de biais systématique** :
+    (résidu moyen ≈ 0 M€), ce qui indique que **le modèle ne présente pas de biais systématique** :
     il ne surestime ni ne sous-estime les ventes de façon structurelle.
 
     La forme en cloche symétrique confirme que les erreurs sont aléatoires et non corrélées
@@ -259,14 +259,14 @@ if st.button("Lancer la simulation", type="primary"):
         c2.metric("ROI moyen — Scénario",f"{roi_scenario:.2%}",
                   delta=f"{roi_delta:+.2%}")
         c3.metric("Δ ROI",               f"{roi_delta_pct:+.2f}%")
-        c4.metric("Gain ventes moyen",   f"{sales_gain:+.2f} k€")
+        c4.metric("Gain ventes moyen",   f"{sales_gain:+.2f} M€")
 
         st.markdown(
             f"""
             **Interprétation**
 
             Une {"hausse" if increase_pct >= 0 else "baisse"} de **{abs(increase_pct)}%** du budget Social Media
-            entraîne un gain de ventes moyen de **{sales_gain:+.2f} k€** par campagne et fait évoluer
+            entraîne un gain de ventes moyen de **{sales_gain:+.2f} M€** par campagne et fait évoluer
             le ROI de **{roi_base:.2%}** à **{roi_scenario:.2%}** ({roi_delta_pct:+.2f}%).
 
             Compte tenu du faible poids de Social Media dans les valeurs SHAP (section 2),
