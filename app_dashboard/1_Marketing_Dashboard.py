@@ -215,3 +215,84 @@ with st.spinner("Calcul SHAP en cours..."):
     st.plotly_chart(fig_shap, use_container_width=True)
 
 st.caption("Rouge = augmente les ventes  |  Bleu = réduit les ventes")
+
+st.markdown("---")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# SIMULATION DE SENSIBILITÉ — BUDGET SOCIAL MEDIA
+# ═════════════════════════════════════════════════════════════════════════════
+st.subheader("Simulation de sensibilité — Budget Social Media")
+st.markdown(
+    """
+    Simulez l'impact d'une variation du budget **Social Media** sur le ROI et les ventes prédites,
+    toutes choses égales par ailleurs. Le modèle XGBoost est appliqué sur le jeu de test avec le budget Social Media modifié.
+    """
+)
+
+
+@st.cache_data
+def load_test_data():
+    from sklearn.model_selection import train_test_split
+    df = pd.read_csv(ROOT / "data" / "Dummy Data HSS.csv").dropna(subset=["Sales"])
+    _, df_test = train_test_split(df, test_size=0.2, random_state=42)
+    return df_test
+
+
+increase_pct = st.slider(
+    "Variation du budget Social Media",
+    min_value=-50,
+    max_value=50,
+    value=10,
+    step=5,
+    format="%d%%",
+    key="sensitivity_slider",
+)
+
+if st.button("Lancer la simulation", type="primary"):
+    try:
+        df_test_raw = load_test_data()
+
+        df_base     = df_test_raw.copy()
+        df_scenario = df_test_raw.copy()
+        df_scenario["Social Media"] = df_scenario["Social Media"] * (1 + increase_pct / 100)
+
+        x_base     = preprocessor.transform(df_base.drop("Sales", axis=1))
+        x_scenario = preprocessor.transform(df_scenario.drop("Sales", axis=1))
+
+        pred_base     = model.predict(x_base)
+        pred_scenario = model.predict(x_scenario)
+
+        costs_base     = df_base[["TV", "Radio", "Social Media"]].sum(axis=1)
+        costs_scenario = df_scenario[["TV", "Radio", "Social Media"]].sum(axis=1)
+        roi_base       = ((pred_base - costs_base) / costs_base).mean()
+        roi_scenario   = ((pred_scenario - costs_scenario) / costs_scenario).mean()
+        roi_delta      = roi_scenario - roi_base
+        roi_delta_pct  = roi_delta / abs(roi_base) * 100
+        sales_gain     = (pred_scenario - pred_base).mean()
+
+        sign = "+" if increase_pct >= 0 else ""
+        st.markdown(f"#### Résultats — Scénario {sign}{increase_pct}% Social Media")
+
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("ROI moyen — Base",     f"{roi_base:.2%}")
+        c2.metric("ROI moyen — Scénario", f"{roi_scenario:.2%}", delta=f"{roi_delta:+.2%}")
+        c3.metric("Δ ROI",                f"{roi_delta_pct:+.2f}%")
+        c4.metric("Gain ventes moyen",    f"{sales_gain:+.2f} M€")
+
+        st.markdown(
+            f"""
+            **Interprétation**
+
+            Une {"hausse" if increase_pct >= 0 else "baisse"} de **{abs(increase_pct)}%** du budget Social Media
+            entraîne un gain de ventes moyen de **{sales_gain:+.2f} M€** par campagne et fait évoluer
+            le ROI de **{roi_base:.2%}** à **{roi_scenario:.2%}** ({roi_delta_pct:+.2f}%).
+
+            Compte tenu du faible poids de Social Media dans les valeurs SHAP,
+            {"cet investissement supplémentaire présente un rendement marginal limité." if increase_pct > 0 else "cette réduction budgétaire a un impact limité sur les ventes prédites."}
+            """
+        )
+
+    except Exception as e:
+        st.error(f"Erreur lors de la simulation : {e}")
+else:
+    st.info("Ajustez le curseur puis cliquez sur **Lancer la simulation** pour calculer l'impact.")
