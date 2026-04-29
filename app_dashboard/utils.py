@@ -6,22 +6,23 @@ API_URL = "http://localhost:8000"
 
 def get_api_prediction(tv: float, radio: float, social: float, influencer: str) -> float | None:
     payload = {
-        "TV": tv,
-        "Radio": radio,
-        "Social Media": social,
-        "Influencer": influencer,
+        "tv": tv,
+        "radio": radio,
+        "social_media": social,
+        "influencer": influencer,
     }
     try:
         response = requests.post(f"{API_URL}/predict", json=payload, timeout=5)
         response.raise_for_status()
         return response.json()["prediction"]
     except requests.exceptions.ConnectionError:
-        st.error("API inaccessible — assurez-vous que le serveur FastAPI tourne sur localhost:8000.")
+        return None  # API non démarrée — l'appelant gère le fallback silencieusement
     except requests.exceptions.Timeout:
-        st.error("L'API n'a pas répondu dans les délais (timeout 5s).")
+        st.warning("API — Timeout (5s), bascule sur le modèle local.")
+        return None
     except requests.exceptions.HTTPError as e:
         st.error(f"Erreur API ({response.status_code}) : {e}")
-    return None
+        return None
 
 
 def format_currency(value: float, decimals: int = 1) -> str:

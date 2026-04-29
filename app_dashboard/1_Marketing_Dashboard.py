@@ -1,17 +1,19 @@
+import sys
 from pathlib import Path
 
 import joblib
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import shap
 import streamlit as st
 
-# ── Chemins ──────────────────────────────────────────────────────────────────
 ROOT       = Path(__file__).resolve().parents[1]
 MODELS_DIR = ROOT / "src" / "models"
 FIGURES    = ROOT / "reports" / "figures"
+
+sys.path.insert(0, str(Path(__file__).parent))
+from utils import get_api_prediction
 
 # ── Config page ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -38,18 +40,23 @@ model, preprocessor, explainer = load_artifacts()
 REF = {"TV": 54.07, "Radio": 18.16, "Social Media": 3.33, "Influencer": "Mega"}
 
 def predict_sales(tv, radio, social, influencer):
+    """Tente l'API, bascule sur le modèle local si indisponible.
+    Retourne (valeur_prédite, source) où source vaut 'API' ou 'local'."""
+    api_result = get_api_prediction(tv, radio, social, influencer)
+    if api_result is not None:
+        return api_result, "API"
     df = pd.DataFrame([{"TV": tv, "Radio": radio,
                         "Social Media": social, "Influencer": influencer}])
     x  = preprocessor.transform(df)
-    return float(model.predict(x)[0])
+    return float(model.predict(x)[0]), "local"
 
 def compute_roi(sales, tv, radio, social):
     costs = tv + radio + social
     return (sales - costs) / costs if costs > 0 else 0.0
 
 # ── Données de référence ──────────────────────────────────────────────────────
-ref_sales = predict_sales(REF["TV"], REF["Radio"], REF["Social Media"], REF["Influencer"])
-ref_roi   = compute_roi(ref_sales, REF["TV"], REF["Radio"], REF["Social Media"])
+ref_sales, _ = predict_sales(REF["TV"], REF["Radio"], REF["Social Media"], REF["Influencer"])
+ref_roi      = compute_roi(ref_sales, REF["TV"], REF["Radio"], REF["Social Media"])
 
 # ═════════════════════════════════════════════════════════════════════════════
 # SIDEBAR
@@ -74,12 +81,17 @@ with st.sidebar:
 
     st.markdown("---")
     st.caption("Référence : budgets moyens observés sur le dataset (TV 54 k€, Radio 18 k€, Social 3.3 k€).")
+    st.markdown("---")
+    if pred_source == "API":
+        st.success("Inférence via **API FastAPI** `localhost:8000`")
+    else:
+        st.info("Inférence via **modèle local** (API hors ligne)")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # CALCULS SCENARIO ACTUEL
 # ═════════════════════════════════════════════════════════════════════════════
-cur_sales = predict_sales(tv, radio, social, influencer)
-cur_roi   = compute_roi(cur_sales, tv, radio, social)
+cur_sales, pred_source = predict_sales(tv, radio, social, influencer)
+cur_roi                = compute_roi(cur_sales, tv, radio, social)
 
 delta_sales = cur_sales - ref_sales
 delta_roi   = cur_roi   - ref_roi
@@ -98,7 +110,7 @@ col1, col2, col3, col4 = st.columns(4)
 col1.metric("Ventes prédites",  f"{cur_sales:.1f} k€", f"{delta_sales:+.1f} vs référence")
 col2.metric("ROI prédit",       f"{cur_roi:.2%}",       f"{delta_roi:+.2%} vs référence")
 col3.metric("Budget total",     f"{tv + radio + social:.1f} k€")
-col4.metric("Modèle utilisé",  "XGBoost")
+col4.metric("Modèle utilisé",  f"XGBoost ({pred_source})")
 
 st.markdown("---")
 
