@@ -1,0 +1,5 @@
+src/models/*.joblib
+src/preprocessing/*.joblib
+__pycache__/
+**/__pycache__/
+*.pyc
