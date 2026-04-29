@@ -14,7 +14,11 @@ def get_api_prediction(tv: float, radio: float, social: float, influencer: str) 
     try:
         response = requests.post(f"{API_URL}/predict", json=payload, timeout=5)
         response.raise_for_status()
-        return response.json()["prediction"]
+        data = response.json()
+        if "prediction" not in data:
+            st.error(f"Erreur API : {data.get('error', data)}")
+            return None
+        return data["prediction"]
     except requests.exceptions.ConnectionError:
         return None  # API non démarrée — l'appelant gère le fallback silencieusement
     except requests.exceptions.Timeout:
