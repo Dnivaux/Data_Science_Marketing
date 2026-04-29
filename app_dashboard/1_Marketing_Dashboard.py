@@ -81,17 +81,17 @@ with st.sidebar:
 
     st.markdown("---")
     st.caption("Référence : budgets moyens observés sur le dataset (TV 54 k€, Radio 18 k€, Social 3.3 k€).")
-    st.markdown("---")
-    if pred_source == "API":
-        st.success("Inférence via **API FastAPI** `localhost:8000`")
-    else:
-        st.info("Inférence via **modèle local** (API hors ligne)")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # CALCULS SCENARIO ACTUEL
 # ═════════════════════════════════════════════════════════════════════════════
 cur_sales, pred_source = predict_sales(tv, radio, social, influencer)
 cur_roi                = compute_roi(cur_sales, tv, radio, social)
+
+if pred_source == "API":
+    st.sidebar.success("Inférence via **API FastAPI** `localhost:8000`")
+else:
+    st.sidebar.info("Inférence via **modèle local** (API hors ligne)")
 
 delta_sales = cur_sales - ref_sales
 delta_roi   = cur_roi   - ref_roi
