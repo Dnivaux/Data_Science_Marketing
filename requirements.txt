@@ -7,5 +7,6 @@ plotly
 scikit-learn
 shap
 streamlit
+seaborn
 uvicorn[standard]==0.24.0
 xgboost
